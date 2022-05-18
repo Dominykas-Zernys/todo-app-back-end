@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const authRouter = require('./routes/authRoutes');
+const tasksRouter = require('./routes/tasksRoutes');
 require('dotenv').config();
 
 const app = express();
@@ -10,6 +12,7 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(cors());
 
-app.get('/', (req, res) => res.json('it works!'));
+app.use('/auth', authRouter);
+app.use('/tasks', tasksRouter);
 
 app.listen(5000, console.log(`Server is running on port ${PORT}`));
