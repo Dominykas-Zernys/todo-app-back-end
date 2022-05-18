@@ -1,3 +1,8 @@
+/* eslint-disable consistent-return */
+/* eslint-disable newline-per-chained-call */
+
+require('dotenv').config();
+
 // Response helpers
 
 function successResponse(res, message) {
@@ -10,8 +15,6 @@ function failResponse(res, message) {
 
 // Database connection
 
-require('dotenv').config();
-
 const dbConfig = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -20,4 +23,83 @@ const dbConfig = {
   database: process.env.DB_DATABASE,
 };
 
-module.exports = { successResponse, failResponse, dbConfig };
+// Password encryption/comparison
+
+const bcrypt = require('bcryptjs');
+
+function encryptPassword(password) {
+  const salt = bcrypt.genSaltSync(10);
+  return bcrypt.hashSync(password, salt);
+}
+
+function comparePassword(enteredPassword, hashedPassword) {
+  return bcrypt.compareSync(enteredPassword, hashedPassword);
+}
+
+// Joi validation
+
+const Joi = require('joi');
+
+async function validateUserData(req, res, next) {
+  try {
+    const schema = Joi.object({
+      email: Joi.string().email().max(40).required(),
+      password: Joi.string().alphanum().min(5).max(40).required(),
+    });
+    await schema.validateAsync(req.body, { abortEarly: false });
+    next();
+  } catch (error) {
+    const errorArray = error.details.map((errorDetail) => errorDetail.message);
+    failResponse(res, errorArray);
+  }
+}
+
+async function validatePost(req, res, next) {
+  try {
+    const schema = Joi.object({
+      userId: Joi.number().required(),
+      description: Joi.string().alphanum().min(3).max(100).required(),
+    });
+    await schema.validateAsync(req.body, { abortEarly: false });
+    next();
+  } catch (error) {
+    const errorArray = error.details.map((errorDetail) => errorDetail.message);
+    failResponse(res, errorArray);
+  }
+}
+
+// JWT Token
+
+const jwt = require('jsonwebtoken');
+
+const jwtSecret = process.env.JWT_SECRET;
+
+function createJWToken(userId) {
+  return jwt.sign({ id: userId }, jwtSecret, { expiresIn: '1h' });
+}
+
+function validateJWToken(req, res, next) {
+  if (!req.headers.authorization) {
+    return failResponse(res, 'no token');
+  }
+  const token = req.headers.authorization.split(' ')[1];
+  jwt.verify(token, jwtSecret, (err, user) => {
+    if (err) {
+      return failResponse(res, 'token not valid');
+    }
+    req.userId = user.id;
+    next();
+  });
+}
+
+module.exports = {
+  successResponse,
+  failResponse,
+  dbConfig,
+  encryptPassword,
+  comparePassword,
+  validateUserData,
+  validatePost,
+  createJWToken,
+  validateJWToken,
+};
