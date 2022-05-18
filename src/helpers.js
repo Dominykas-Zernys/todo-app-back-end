@@ -46,7 +46,7 @@ async function validateUserData(req, res, next) {
       email: Joi.string().email().max(40).required(),
       password: Joi.string().alphanum().min(5).max(40).required(),
     });
-    await schema.validateAsync(req.body, { abortEarly: false });
+    await schema.validateAsync(req.body);
     next();
   } catch (error) {
     const errorArray = error.details.map((errorDetail) => errorDetail.message);
@@ -57,10 +57,9 @@ async function validateUserData(req, res, next) {
 async function validatePost(req, res, next) {
   try {
     const schema = Joi.object({
-      userId: Joi.number().required(),
-      description: Joi.string().alphanum().min(3).max(100).required(),
+      description: Joi.string().min(3).max(100).required(),
     });
-    await schema.validateAsync(req.body, { abortEarly: false });
+    await schema.validateAsync(req.body);
     next();
   } catch (error) {
     const errorArray = error.details.map((errorDetail) => errorDetail.message);
