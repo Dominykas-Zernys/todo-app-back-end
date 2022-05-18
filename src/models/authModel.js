@@ -9,7 +9,6 @@ async function checkIfAlreadyRegistered(email) {
     await con.close();
     return data.length > 0 && data;
   } catch (error) {
-    console.log(error);
     return false;
   }
 }
@@ -22,7 +21,6 @@ async function registerUserToDb({ email, password }) {
     await con.close();
     return data;
   } catch (error) {
-    console.log(error);
     return false;
   }
 }
@@ -35,7 +33,6 @@ async function loginUserToDb(email) {
     await con.close();
     return data;
   } catch (error) {
-    console.log(error);
     return false;
   }
 }

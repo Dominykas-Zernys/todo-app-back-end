@@ -19,7 +19,7 @@ async function postTask(req, res) {
 }
 
 async function deleteTask(req, res) {
-  const deletedTask = await deleteTaskFromDb(req.userId, req.params);
+  const deletedTask = await deleteTaskFromDb(req.userId, req.params.id);
   deletedTask
     ? successResponse(res, deletedTask)
     : failResponse(res, "couldn't delete the task");

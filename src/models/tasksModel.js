@@ -9,7 +9,6 @@ async function getTasksFromDb(userId) {
     await con.close();
     return tasks;
   } catch (error) {
-    console.log(error);
     return false;
   }
 }
@@ -22,7 +21,6 @@ async function createNewTask(userId, description) {
     await con.close();
     return tasks;
   } catch (error) {
-    console.log(error);
     return false;
   }
 }
@@ -35,7 +33,6 @@ async function deleteTaskFromDb(userId, taskId) {
     await con.close();
     return tasks;
   } catch (error) {
-    console.log(error);
     return false;
   }
 }
